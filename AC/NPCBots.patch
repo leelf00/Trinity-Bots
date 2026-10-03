@@ -17636,7 +17636,7 @@ index e1ad3744bf..57f37dfb38 100644
  #                                                                                                 #
  # GAME SETTINGS END                                                                               #
 diff --git a/src/server/database/Database/Implementation/CharacterDatabase.cpp b/src/server/database/Database/Implementation/CharacterDatabase.cpp
-index a3def12d13..fa3fe269f2 100644
+index e4dffef486..e55200a554 100644
 --- a/src/server/database/Database/Implementation/CharacterDatabase.cpp
 +++ b/src/server/database/Database/Implementation/CharacterDatabase.cpp
 @@ -649,6 +649,38 @@ void CharacterDatabaseConnection::DoPrepareStatements()
@@ -101031,7 +101031,7 @@ index c4c7969cee..b3516e365e 100644
      }
  
 diff --git a/src/server/game/Entities/Creature/Creature.cpp b/src/server/game/Entities/Creature/Creature.cpp
-index 8f84bd3351..642bd5986b 100644
+index 2182bd8d02..4439b5b0f6 100644
 --- a/src/server/game/Entities/Creature/Creature.cpp
 +++ b/src/server/game/Entities/Creature/Creature.cpp
 @@ -51,6 +51,13 @@
@@ -101336,7 +101336,7 @@ index 8f84bd3351..642bd5986b 100644
      if (force)
      {
          if (IsAlive())
-@@ -2178,6 +2327,11 @@ void Creature::Respawn(bool force)
+@@ -2183,6 +2332,11 @@ void Creature::Respawn(bool force)
  
  void Creature::ForcedDespawn(Milliseconds timeMSToDespawn, Seconds forceRespawnTimer)
  {
@@ -101348,7 +101348,7 @@ index 8f84bd3351..642bd5986b 100644
      if (timeMSToDespawn > 0ms)
      {
          ForcedDespawnDelayEvent* pEvent = new ForcedDespawnDelayEvent(*this, forceRespawnTimer);
-@@ -2301,6 +2455,9 @@ void Creature::LoadTemplateImmunities(int32 creatureImmunitiesId)
+@@ -2306,6 +2460,9 @@ void Creature::LoadTemplateImmunities(int32 creatureImmunitiesId)
  }
  
  bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
@@ -101358,7 +101358,7 @@ index 8f84bd3351..642bd5986b 100644
  {
      if (!spellInfo)
          return false;
-@@ -2580,6 +2737,11 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
+@@ -2585,6 +2742,11 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
      if (GetCharmerOrOwnerGUID())
          return false;
  
@@ -101370,7 +101370,7 @@ index 8f84bd3351..642bd5986b 100644
      /// @todo: Implement aggro range, detection range and assistance range templates
      if (m_creatureInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_IGNORE_ALL_ASSISTANCE_CALLS))
      {
-@@ -2681,6 +2843,11 @@ void Creature::SaveRespawnTime()
+@@ -2686,6 +2848,11 @@ void Creature::SaveRespawnTime()
      if (IsSummon() || !m_spawnId || (m_creatureData && !m_creatureData->dbData))
          return;
  
@@ -101382,7 +101382,7 @@ index 8f84bd3351..642bd5986b 100644
      GetMap()->SaveCreatureRespawnTime(m_spawnId, m_respawnTime);
  }
  
-@@ -2876,6 +3043,21 @@ void Creature::SendZoneUnderAttackMessage(Player* attacker)
+@@ -2881,6 +3048,21 @@ void Creature::SendZoneUnderAttackMessage(Player* attacker)
      sWorldSessionMgr->SendGlobalMessage(&data, nullptr, (attacker->GetTeamId() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE));
  }
  
@@ -101404,7 +101404,7 @@ index 8f84bd3351..642bd5986b 100644
  /**
   * @brief Set in combat all units in the dungeon/raid. Affect only units with IsAIEnabled.
   */
-@@ -3082,6 +3264,13 @@ uint32 Creature::GetSpellCooldown(uint32 spell_id) const
+@@ -3087,6 +3269,13 @@ uint32 Creature::GetSpellCooldown(uint32 spell_id) const
  
  bool Creature::HasSpellCooldown(uint32 spell_id) const
  {
@@ -101418,7 +101418,7 @@ index 8f84bd3351..642bd5986b 100644
      CreatureSpellCooldowns::const_iterator itr = m_CreatureSpellCooldowns.find(spell_id);
      return (itr != m_CreatureSpellCooldowns.end() && itr->second.end > GameTime::GetGameTimeMS().count());
  }
-@@ -3170,6 +3359,11 @@ void Creature::PauseMovementForInteraction()
+@@ -3175,6 +3364,11 @@ void Creature::PauseMovementForInteraction()
  
  void Creature::AllLootRemovedFromCorpse()
  {
@@ -101430,7 +101430,7 @@ index 8f84bd3351..642bd5986b 100644
      if (loot.loot_type != LOOT_SKINNING && !IsPet() && GetCreatureTemplate()->SkinLootId && hasLootRecipient())
      {
          if (LootTemplates_Skinning.HaveLootFor(GetCreatureTemplate()->SkinLootId))
-@@ -3345,6 +3539,11 @@ void Creature::SetPosition(float x, float y, float z, float o)
+@@ -3350,6 +3544,11 @@ void Creature::SetPosition(float x, float y, float z, float o)
      if (!Acore::IsValidMapCoord(x, y, z, o))
          return;
  
@@ -101442,7 +101442,7 @@ index 8f84bd3351..642bd5986b 100644
      GetMap()->CreatureRelocation(this, x, y, z, o);
  }
  
-@@ -3424,6 +3623,11 @@ bool Creature::CanSwim() const
+@@ -3429,6 +3628,11 @@ bool Creature::CanSwim() const
      if (Unit::CanSwim() || (!Unit::CanSwim() && !CanFly()))
          return true;
  
@@ -101454,7 +101454,7 @@ index 8f84bd3351..642bd5986b 100644
      if (IsPet())
          return true;
  
-@@ -3508,6 +3712,17 @@ void Creature::UpdateMovementFlags()
+@@ -3513,6 +3717,17 @@ void Creature::UpdateMovementFlags()
      if (!info)
          return;
  
@@ -101472,7 +101472,7 @@ index 8f84bd3351..642bd5986b 100644
      // Creatures with CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE should control MovementFlags in your own scripts
      if (info->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE))
          return;
-@@ -3603,6 +3818,15 @@ void Creature::SetDisplayId(uint32 modelId, float displayScale /*= 1.f*/)
+@@ -3608,6 +3823,15 @@ void Creature::SetDisplayId(uint32 modelId, float displayScale /*= 1.f*/)
      SetObjectScale(displayScale);
  
      SetFloatValue(UNIT_FIELD_COMBATREACH, combatReach * GetObjectScale());
@@ -101488,7 +101488,7 @@ index 8f84bd3351..642bd5986b 100644
  }
  
  void Creature::SetDisplayFromModel(uint32 modelIdx)
-@@ -3920,6 +4144,10 @@ void Creature::ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds
+@@ -3925,6 +4149,10 @@ void Creature::ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds
  
  bool Creature::IsDamageEnoughForLootingAndReward() const
  {
@@ -101499,7 +101499,7 @@ index 8f84bd3351..642bd5986b 100644
      return m_creatureInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ) || (_playerDamageReq == 0 && _damagedByPlayer);
  }
  
-@@ -4019,3 +4247,408 @@ bool Creature::IsUpdateNeeded()
+@@ -4024,3 +4252,408 @@ bool Creature::IsUpdateNeeded()
  
      return false;
  }
@@ -102661,7 +102661,7 @@ index 269d82604f..8445e7db10 100644
      uint32 _sumLevel;
      uint32 _xp;
 diff --git a/src/server/game/Entities/Player/Player.cpp b/src/server/game/Entities/Player/Player.cpp
-index 6049b563cf..9ce9e7f345 100644
+index f1b88035f6..f9bfb13cf6 100644
 --- a/src/server/game/Entities/Player/Player.cpp
 +++ b/src/server/game/Entities/Player/Player.cpp
 @@ -103,6 +103,12 @@
@@ -102737,7 +102737,7 @@ index 6049b563cf..9ce9e7f345 100644
  void Player::RegenerateAll()
  {
      //if (m_regenTimer <= 500)
-@@ -2145,6 +2183,11 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid const& guid, uint32 npcflag
+@@ -2142,6 +2180,11 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid const& guid, uint32 npcflag
      if (creature->GetCharmerGUID())
          return nullptr;
  
@@ -102749,7 +102749,7 @@ index 6049b563cf..9ce9e7f345 100644
      // xinef: perform better check
      if (creature->GetReactionTo(this) <= REP_UNFRIENDLY)
          return nullptr;
-@@ -2302,6 +2345,10 @@ void Player::SetGameMaster(bool on)
+@@ -2299,6 +2342,10 @@ void Player::SetGameMaster(bool on)
          SetServerSideVisibilityDetect(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
      }
  
@@ -102760,7 +102760,7 @@ index 6049b563cf..9ce9e7f345 100644
      UpdateObjectVisibility();
  }
  
-@@ -2377,6 +2424,54 @@ void Player::RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method
+@@ -2374,6 +2421,54 @@ void Player::RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method
  {
      if (group)
      {
@@ -102815,7 +102815,7 @@ index 6049b563cf..9ce9e7f345 100644
          group->RemoveMember(guid, method, kicker, reason);
          group = nullptr;
      }
-@@ -2413,6 +2508,9 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
+@@ -2410,6 +2505,9 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
          return;
  
      if (victim && victim->IsCreature() && !victim->ToCreature()->hasLootRecipient())
@@ -102825,7 +102825,7 @@ index 6049b563cf..9ce9e7f345 100644
          return;
  
      uint8 level = GetLevel();
-@@ -2583,6 +2681,10 @@ void Player::GiveLevel(uint8 level)
+@@ -2580,6 +2678,10 @@ void Player::GiveLevel(uint8 level)
      SendQuestGiverStatusMultiple();
  
      sScriptMgr->OnPlayerLevelChanged(this, oldLevel);
@@ -102836,7 +102836,7 @@ index 6049b563cf..9ce9e7f345 100644
  }
  
  bool Player::IsMaxLevel() const
-@@ -4391,6 +4493,12 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
+@@ -4388,6 +4490,12 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
  
                  Corpse::DeleteFromDB(playerGuid, trans);
  
@@ -102849,7 +102849,7 @@ index 6049b563cf..9ce9e7f345 100644
                  sScriptMgr->OnPlayerDeleteFromDB(trans, lowGuid);
  
                  CharacterDatabase.CommitTransaction(trans);
-@@ -6346,6 +6454,49 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
+@@ -6343,6 +6451,49 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
              UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL, 1, 0, victim);
              sScriptMgr->OnPlayerVictimRewardAfter(this, victim, killer_title, victim_rank, honor_f);
          }
@@ -102899,7 +102899,7 @@ index 6049b563cf..9ce9e7f345 100644
          else
          {
              if (!uVictim->ToCreature()->IsRacialLeader())
-@@ -8072,6 +8223,14 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
+@@ -8069,6 +8220,14 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
              if (GameObjectTemplateAddon const* addon = go->GetTemplateAddon())
                  loot->generateMoneyLoot(addon->mingold, addon->maxgold);
  
@@ -102914,7 +102914,7 @@ index 6049b563cf..9ce9e7f345 100644
              if (loot_type == LOOT_FISHING)
                  go->GetFishLoot(loot, this);
              else if (loot_type == LOOT_FISHING_JUNK)
-@@ -10912,6 +11071,18 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
+@@ -10909,6 +11068,18 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
          return false;
      }
  
@@ -102933,7 +102933,7 @@ index 6049b563cf..9ce9e7f345 100644
      if (!(pProto->AllowableClass & getClassMask()) && pProto->Bonding == BIND_WHEN_PICKED_UP && !IsGameMaster())
      {
          SendBuyError(BUY_ERR_CANT_FIND_ITEM, nullptr, item, 0);
-@@ -12992,6 +13163,9 @@ bool Player::isHonorOrXPTarget(Unit* victim) const
+@@ -12989,6 +13160,9 @@ bool Player::isHonorOrXPTarget(Unit* victim) const
  
      if (victim->IsCreature())
          if (victim->IsTotem() || victim->IsCritter() || victim->IsPet() || victim->ToCreature()->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_XP))
@@ -106989,7 +106989,7 @@ index 3189ccd829..78bb210a38 100644
          return;
  
 diff --git a/src/server/game/Instances/InstanceScript.cpp b/src/server/game/Instances/InstanceScript.cpp
-index cf4d56aa0f..5715328c0d 100644
+index 16b336ca91..57ab9c91a0 100644
 --- a/src/server/game/Instances/InstanceScript.cpp
 +++ b/src/server/game/Instances/InstanceScript.cpp
 @@ -34,6 +34,10 @@
@@ -107003,7 +107003,7 @@ index cf4d56aa0f..5715328c0d 100644
  BossBoundaryData::~BossBoundaryData()
  {
      for (const_iterator it = begin(); it != end(); ++it)
-@@ -705,6 +709,14 @@ void InstanceScript::DoRemoveAurasDueToSpellOnPlayers(uint32 spell)
+@@ -711,6 +715,14 @@ void InstanceScript::DoRemoveAurasDueToSpellOnPlayers(uint32 spell)
          player->RemoveAurasDueToSpell(spell);
          if (Pet* pet = player->GetPet())
              pet->RemoveAurasDueToSpell(spell);
@@ -107018,7 +107018,7 @@ index cf4d56aa0f..5715328c0d 100644
      });
  }
  
-@@ -714,9 +726,35 @@ void InstanceScript::DoCastSpellOnPlayers(uint32 spell)
+@@ -720,9 +732,35 @@ void InstanceScript::DoCastSpellOnPlayers(uint32 spell)
      instance->DoForAllPlayers([&](Player* player)
      {
          player->CastSpell(player, spell, true);
@@ -107055,7 +107055,7 @@ index cf4d56aa0f..5715328c0d 100644
  {
      if (!player)
 diff --git a/src/server/game/Instances/InstanceScript.h b/src/server/game/Instances/InstanceScript.h
-index 8b9c1e6779..b817736e2a 100644
+index f97999d7cb..cfd4176b52 100644
 --- a/src/server/game/Instances/InstanceScript.h
 +++ b/src/server/game/Instances/InstanceScript.h
 @@ -193,6 +193,13 @@ public:
@@ -107073,7 +107073,7 @@ index 8b9c1e6779..b817736e2a 100644
       * @brief Open or close a GameObject by GUID.
       * @param guid The GUID of the GameObject. Pass ObjectGuid::Empty when providing the go pointer directly.
 diff --git a/src/server/game/Maps/Map.cpp b/src/server/game/Maps/Map.cpp
-index 86b86a2729..83288bb310 100644
+index ba4c57ed8e..1803a22315 100644
 --- a/src/server/game/Maps/Map.cpp
 +++ b/src/server/game/Maps/Map.cpp
 @@ -46,6 +46,10 @@
@@ -107436,7 +107436,7 @@ index fc96398079..ce59d20aca 100644
      {
          //! Call script hook before other logout events
 diff --git a/src/server/game/Spells/Auras/SpellAuraEffects.cpp b/src/server/game/Spells/Auras/SpellAuraEffects.cpp
-index d6887290d6..5ed11a8767 100644
+index 4fc48f0e61..3a08066379 100644
 --- a/src/server/game/Spells/Auras/SpellAuraEffects.cpp
 +++ b/src/server/game/Spells/Auras/SpellAuraEffects.cpp
 @@ -40,6 +40,11 @@
@@ -107583,7 +107583,7 @@ index d6887290d6..5ed11a8767 100644
  }
  
  void AuraEffect::HandleAuraModStateImmunity(AuraApplication const* aurApp, uint8 mode, bool apply) const
-@@ -6224,6 +6305,10 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster)
+@@ -6229,6 +6310,10 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster)
  
      if (triggeredSpellInfo)
      {
@@ -107594,7 +107594,7 @@ index d6887290d6..5ed11a8767 100644
          if (Unit* triggerCaster = triggeredSpellInfo->NeedsToBeTriggeredByCaster(m_spellInfo, GetEffIndex()) ? caster : target)
          {
              SpellCastTargets targets;
-@@ -6250,6 +6335,10 @@ void AuraEffect::HandlePeriodicTriggerSpellWithValueAuraTick(Unit* target, Unit*
+@@ -6255,6 +6340,10 @@ void AuraEffect::HandlePeriodicTriggerSpellWithValueAuraTick(Unit* target, Unit*
      uint32 triggerSpellId = GetSpellInfo()->Effects[m_effIndex].TriggerSpell;
      if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(triggerSpellId))
      {
@@ -107605,7 +107605,7 @@ index d6887290d6..5ed11a8767 100644
          if (Unit* triggerCaster = triggeredSpellInfo->NeedsToBeTriggeredByCaster(m_spellInfo, GetEffIndex()) ? caster : target)
          {
              SpellCastTargets targets;
-@@ -6364,9 +6453,38 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
+@@ -6369,9 +6458,38 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
  
      // calculate crit chance
      bool crit = false;
@@ -107644,7 +107644,7 @@ index d6887290d6..5ed11a8767 100644
      // Auras reducing damage from AOE spells
      if (!GetSpellInfo()->HasAttribute(SPELL_ATTR4_IGNORE_DAMAGE_TAKEN_MODIFIERS))
      {
-@@ -6916,6 +7034,48 @@ void AuraEffect::HandleProcTriggerSpellAuraProc(AuraApplication* aurApp, ProcEve
+@@ -6921,6 +7039,48 @@ void AuraEffect::HandleProcTriggerSpellAuraProc(AuraApplication* aurApp, ProcEve
      if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(triggerSpellId))
      {
          LOG_DEBUG("spells.aura", "AuraEffect::HandleProcTriggerSpellAuraProc: Triggering spell {} from aura {} proc", triggeredSpellInfo->Id, GetId());
@@ -107693,7 +107693,7 @@ index d6887290d6..5ed11a8767 100644
          triggerCaster->CastSpell(triggerTarget, triggeredSpellInfo, true, nullptr, this);
      }
      else
-@@ -6935,6 +7095,10 @@ void AuraEffect::HandleProcTriggerSpellWithValueAuraProc(AuraApplication* aurApp
+@@ -6940,6 +7100,10 @@ void AuraEffect::HandleProcTriggerSpellWithValueAuraProc(AuraApplication* aurApp
          // used only with EXTRA_LOGS
          (void)triggeredSpellInfo;
  
@@ -108377,7 +108377,7 @@ index 950151aa4b..27ab647b0b 100644
      bool IsAutoRepeat() const { return m_autoRepeat; }
      void SetAutoRepeat(bool rep) { m_autoRepeat = rep; }
 diff --git a/src/server/game/Spells/SpellEffects.cpp b/src/server/game/Spells/SpellEffects.cpp
-index ed4b1c532f..b42c755994 100644
+index 351a5e3c3f..c88e21bc68 100644
 --- a/src/server/game/Spells/SpellEffects.cpp
 +++ b/src/server/game/Spells/SpellEffects.cpp
 @@ -498,6 +498,17 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
@@ -108527,7 +108527,7 @@ index ed4b1c532f..b42c755994 100644
                          break;
                      }
                      // Shield of Righteousness
-@@ -834,6 +946,62 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
+@@ -821,6 +933,62 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
          // special cases
          switch (triggered_spell_id)
          {
@@ -108590,7 +108590,7 @@ index ed4b1c532f..b42c755994 100644
              // Mirror Image
              case 58832:
                  {
-@@ -947,6 +1115,10 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
+@@ -934,6 +1102,10 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
          return;
      }
  
@@ -108601,7 +108601,7 @@ index ed4b1c532f..b42c755994 100644
      SpellCastTargets targets;
      if (effectHandleMode == SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
      {
-@@ -1012,6 +1184,10 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
+@@ -999,6 +1171,10 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
          return;
      }
  
@@ -108612,7 +108612,7 @@ index ed4b1c532f..b42c755994 100644
      SpellCastTargets targets;
      if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET)
      {
-@@ -1457,6 +1633,11 @@ void Spell::EffectPowerDrain(SpellEffIndex effIndex)
+@@ -1444,6 +1620,11 @@ void Spell::EffectPowerDrain(SpellEffIndex effIndex)
      if (PowerType == POWER_MANA)
          power -= unitTarget->GetSpellCritDamageReduction(power);
  
@@ -108624,7 +108624,7 @@ index ed4b1c532f..b42c755994 100644
      int32 newDamage = -(unitTarget->ModifyPower(PowerType, -int32(power)));
  
      float gainMultiplier = 0.0f;
-@@ -2207,6 +2388,45 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
+@@ -2194,6 +2375,45 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
      if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
          return;
  
@@ -108670,7 +108670,7 @@ index ed4b1c532f..b42c755994 100644
      if (!unitCaster->IsPlayer())
      {
          LOG_DEBUG("spells.aura", "WORLD: Open Lock - No Player Caster!");
-@@ -3621,6 +3841,14 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
+@@ -3608,6 +3828,14 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                          if (Item* item = unitCaster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
                              if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
                                  AddPct(totalDamagePercentMod, 50.0f);
@@ -108685,7 +108685,7 @@ index ed4b1c532f..b42c755994 100644
                  }
                  // Mutilate (for each hand)
                  else if (m_spellInfo->SpellFamilyFlags[1] & 0x6)
-@@ -4006,6 +4234,14 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
+@@ -3993,6 +4221,14 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
              if (Battleground* bg = player->GetBattleground())
                  bg->SetDroppedFlagGUID(pGameObj->GetGUID(), player->GetTeamId() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
  
@@ -108700,7 +108700,7 @@ index ed4b1c532f..b42c755994 100644
      if (GameObject* linkedTrap = pGameObj->GetLinkedTrap())
      {
          linkedTrap->SetRespawnTime(duration > 0 ? duration/IN_MILLISECONDS :0);
-@@ -5143,6 +5379,11 @@ void Spell::EffectSkinning(SpellEffIndex /*effIndex*/)
+@@ -5130,6 +5366,11 @@ void Spell::EffectSkinning(SpellEffIndex /*effIndex*/)
  
      uint32 skill = creature->GetCreatureTemplate()->GetRequiredLootSkill();
  
@@ -108712,7 +108712,7 @@ index ed4b1c532f..b42c755994 100644
      creature->RemoveUnitFlag(UNIT_FLAG_SKINNABLE);
      creature->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
      unitCaster->ToPlayer()->SendLoot(creature->GetGUID(), LOOT_SKINNING);
-@@ -6369,6 +6610,21 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const*
+@@ -6356,6 +6597,21 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const*
      if (Player* modOwner = m_originalCaster->GetSpellModOwner())
          modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
  
@@ -108889,7 +108889,7 @@ index 416ef7a818..1802699ef9 100644
      void _InitializeExplicitTargetMask();
      bool _IsPositiveEffect(uint8 effIndex, bool deep) const;
 diff --git a/src/server/game/Spells/SpellInfoCorrections.cpp b/src/server/game/Spells/SpellInfoCorrections.cpp
-index 83a315d090..a6ebf27175 100644
+index c64133d25b..afd9bee35c 100644
 --- a/src/server/game/Spells/SpellInfoCorrections.cpp
 +++ b/src/server/game/Spells/SpellInfoCorrections.cpp
 @@ -40,6 +40,68 @@ void SpellMgr::LoadSpellInfoCorrections()
@@ -109015,7 +109015,7 @@ index b7deaa00a2..15061f0ea4 100644
          float y = handler->GetSession()->GetPlayer()->GetPositionY();
          float z = handler->GetSession()->GetPlayer()->GetPositionZ();
 diff --git a/src/server/scripts/EasternKingdoms/ZulAman/zulaman.cpp b/src/server/scripts/EasternKingdoms/ZulAman/zulaman.cpp
-index 23f3a58259..ab177cc42c 100644
+index 50bbc1d4c1..862becfef9 100644
 --- a/src/server/scripts/EasternKingdoms/ZulAman/zulaman.cpp
 +++ b/src/server/scripts/EasternKingdoms/ZulAman/zulaman.cpp
 @@ -26,6 +26,10 @@
@@ -109029,7 +109029,7 @@ index 23f3a58259..ab177cc42c 100644
  /*######
  ## npc_forest_frog
  ######*/
-@@ -905,6 +909,24 @@ class spell_call_of_the_beast : public SpellScript
+@@ -910,6 +914,24 @@ class spell_call_of_the_beast : public SpellScript
      }
  };
  
@@ -109054,7 +109054,7 @@ index 23f3a58259..ab177cc42c 100644
  void AddSC_zulaman()
  {
      RegisterZulAmanCreatureAI(npc_forest_frog);
-@@ -918,4 +940,8 @@ void AddSC_zulaman()
+@@ -923,4 +945,8 @@ void AddSC_zulaman()
      RegisterSpellScript(spell_alert_drums);
      RegisterSpellScript(spell_summon_amanishi_sentries);
      RegisterSpellScript(spell_call_of_the_beast);

@@ -135,7 +135,7 @@
  src/server/game/DataStores/DBCStores.h             |     2 +-
  src/server/game/DungeonFinding/LFGMgr.cpp          |   198 +
  src/server/game/DungeonFinding/LFGScripts.cpp      |    29 +
- src/server/game/Entities/Creature/Creature.cpp     |   594 +
+ src/server/game/Entities/Creature/Creature.cpp     |   602 +
  src/server/game/Entities/Creature/Creature.h       |    91 +
  src/server/game/Entities/Creature/CreatureData.h   |    24 +-
  .../game/Entities/Creature/TemporarySummon.cpp     |    36 +
@@ -211,7 +211,7 @@
  src/server/shared/DataStores/DBCfmt.h              |     2 +-
  src/server/shared/SharedDefines.h                  |     7 +
  src/server/worldserver/worldserver.conf.dist       |   792 +
- 213 files changed, 99537 insertions(+), 288 deletions(-)
+ 213 files changed, 99545 insertions(+), 288 deletions(-)
  delete mode 100644 .circleci/config.yml
  delete mode 100644 .github/workflows/issue-closer.yml
  delete mode 100644 .github/workflows/pr-labeler.yml
@@ -95930,7 +95930,7 @@ index f7ebb039c3..61d1bd00d4 100644
      }
  }
 diff --git a/src/server/game/Entities/Creature/Creature.cpp b/src/server/game/Entities/Creature/Creature.cpp
-index a0fa59a1a3..8b3ddced7f 100644
+index a0fa59a1a3..375439288f 100644
 --- a/src/server/game/Entities/Creature/Creature.cpp
 +++ b/src/server/game/Entities/Creature/Creature.cpp
 @@ -58,6 +58,13 @@
@@ -96121,7 +96121,22 @@ index a0fa59a1a3..8b3ddced7f 100644
      // update in loaded data
      if (!m_spawnId)
          m_spawnId = sObjectMgr->GenerateCreatureSpawnId();
-@@ -1638,6 +1732,11 @@ bool Creature::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap,
+@@ -1486,6 +1580,14 @@ void Creature::UpdateLevelDependantStats()
+     m_baseAttackPower       = stats->AttackPower;
+     m_baseRangedAttackPower = stats->RangedAttackPower;
+ 
++    //npcbot
++    if (IsNPCBotOrPet())
++    {
++        m_baseAttackPower = 1;
++        m_baseRangedAttackPower = m_baseAttackPower;
++    }
++    //end npcbot
++
+     float armor = (float)stats->GenerateArmor(cInfo); /// @todo Why is this treated as uint32 when it's a float?
+     SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
+ }
+@@ -1638,6 +1740,11 @@ bool Creature::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap,
          return false;
      }
  
@@ -96133,7 +96148,7 @@ index a0fa59a1a3..8b3ddced7f 100644
      m_spawnId = spawnId;
  
      m_respawnCompatibilityMode = ((data->spawnGroupData->flags & SPAWNGROUP_FLAG_COMPATIBILITY_MODE) != 0);
-@@ -1653,6 +1752,11 @@ bool Creature::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap,
+@@ -1653,6 +1760,11 @@ bool Creature::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap,
  
      m_deathState = ALIVE;
  
@@ -96145,7 +96160,7 @@ index a0fa59a1a3..8b3ddced7f 100644
      m_respawnTime = GetMap()->GetCreatureRespawnTime(m_spawnId);
  
      if (!m_respawnTime && !map->IsSpawnGroupActive(data->spawnGroupData->groupId))
-@@ -1702,6 +1806,24 @@ bool Creature::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap,
+@@ -1702,6 +1814,24 @@ bool Creature::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap,
  
      m_stringIds[AsUnderlyingType(StringIdType::Spawn)] = &data->StringId;
  
@@ -96170,7 +96185,7 @@ index a0fa59a1a3..8b3ddced7f 100644
      if (addToMap && !GetMap()->AddToMap(this))
          return false;
      return true;
-@@ -1715,6 +1837,11 @@ void Creature::SetCanDualWield(bool value)
+@@ -1715,6 +1845,11 @@ void Creature::SetCanDualWield(bool value)
  
  void Creature::LoadEquipment(int8 id, bool force /*= true*/)
  {
@@ -96182,7 +96197,7 @@ index a0fa59a1a3..8b3ddced7f 100644
      if (id == 0)
      {
          if (force)
-@@ -1861,6 +1988,11 @@ bool Creature::IsInvisibleDueToDespawn() const
+@@ -1861,6 +1996,11 @@ bool Creature::IsInvisibleDueToDespawn() const
      if (IsAlive() || isDying() || m_corpseRemoveTime > GameTime::GetGameTime())
          return false;
  
@@ -96194,7 +96209,7 @@ index a0fa59a1a3..8b3ddced7f 100644
      return true;
  }
  
-@@ -1878,9 +2010,18 @@ bool Creature::CanStartAttack(Unit const* who, bool force) const
+@@ -1878,9 +2018,18 @@ bool Creature::CanStartAttack(Unit const* who, bool force) const
          return false;
  
      // This set of checks is should be done only for creatures
@@ -96213,7 +96228,7 @@ index a0fa59a1a3..8b3ddced7f 100644
  
      // Do not attack non-combat pets
      if (who->GetTypeId() == TYPEID_UNIT && who->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
-@@ -2066,6 +2207,11 @@ void Creature::setDeathState(DeathState s)
+@@ -2066,6 +2215,11 @@ void Creature::setDeathState(DeathState s)
  
  void Creature::Respawn(bool force)
  {
@@ -96225,7 +96240,7 @@ index a0fa59a1a3..8b3ddced7f 100644
      if (force)
      {
          if (IsAlive())
-@@ -2129,6 +2275,11 @@ void Creature::Respawn(bool force)
+@@ -2129,6 +2283,11 @@ void Creature::Respawn(bool force)
  
  void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
  {
@@ -96237,7 +96252,7 @@ index a0fa59a1a3..8b3ddced7f 100644
      if (timeMSToDespawn)
      {
          m_Events.AddEvent(new ForcedDespawnDelayEvent(*this, forceRespawnTimer), m_Events.CalculateTime(Milliseconds(timeMSToDespawn)));
-@@ -2396,6 +2547,11 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
+@@ -2396,6 +2555,11 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
      if (!GetCharmerOrOwnerGUID().IsEmpty())
          return false;
  
@@ -96249,7 +96264,7 @@ index a0fa59a1a3..8b3ddced7f 100644
      // only from same creature faction
      if (checkfaction)
      {
-@@ -2455,6 +2611,12 @@ void Creature::SaveRespawnTime(uint32 forceDelay)
+@@ -2455,6 +2619,12 @@ void Creature::SaveRespawnTime(uint32 forceDelay)
          ri.type = SPAWN_TYPE_CREATURE;
          ri.spawnId = m_spawnId;
          ri.respawnTime = m_respawnTime;
@@ -96262,7 +96277,7 @@ index a0fa59a1a3..8b3ddced7f 100644
          GetMap()->SaveRespawnInfoDB(ri);
          return;
      }
-@@ -2596,6 +2758,16 @@ void Creature::SendZoneUnderAttackMessage(Player* attacker)
+@@ -2596,6 +2766,16 @@ void Creature::SendZoneUnderAttackMessage(Player* attacker)
  
  uint32 Creature::GetShieldBlockValue() const                  //dunno mob block value
  {
@@ -96279,7 +96294,7 @@ index a0fa59a1a3..8b3ddced7f 100644
      return (GetLevel()/2 + uint32(GetStat(STAT_STRENGTH)/20));
  }
  
-@@ -2654,6 +2826,17 @@ void Creature::UpdateMovementFlags()
+@@ -2654,6 +2834,17 @@ void Creature::UpdateMovementFlags()
      if (IsMovedByClient())
          return;
  
@@ -96297,7 +96312,7 @@ index a0fa59a1a3..8b3ddced7f 100644
      // Creatures with CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE should control MovementFlags in your own scripts
      if (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE)
          return;
-@@ -2704,6 +2887,11 @@ bool Creature::CanSwim() const
+@@ -2704,6 +2895,11 @@ bool Creature::CanSwim() const
      if (IsPet())
          return true;
  
@@ -96309,7 +96324,7 @@ index a0fa59a1a3..8b3ddced7f 100644
      return false;
  }
  
-@@ -2728,6 +2916,11 @@ void Creature::RefreshCanSwimFlag(bool recheck)
+@@ -2728,6 +2924,11 @@ void Creature::RefreshCanSwimFlag(bool recheck)
  
  void Creature::AllLootRemovedFromCorpse()
  {
@@ -96321,7 +96336,7 @@ index a0fa59a1a3..8b3ddced7f 100644
      if (loot.loot_type != LOOT_SKINNING && !IsPet() && GetCreatureTemplate()->SkinLootId && hasLootRecipient())
          if (LootTemplates_Skinning.HaveLootFor(GetCreatureTemplate()->SkinLootId))
              SetUnitFlag(UNIT_FLAG_SKINNABLE);
-@@ -3029,6 +3222,15 @@ void Creature::SetDisplayId(uint32 modelId)
+@@ -3029,6 +3230,15 @@ void Creature::SetDisplayId(uint32 modelId)
          SetBoundingRadius((IsPet() ? 1.0f : minfo->bounding_radius) * GetObjectScale());
          SetCombatReach((IsPet() ? DEFAULT_PLAYER_COMBAT_REACH : minfo->combat_reach) * GetObjectScale());
      }
@@ -96337,7 +96352,7 @@ index a0fa59a1a3..8b3ddced7f 100644
  }
  
  void Creature::SetTarget(ObjectGuid const& guid)
-@@ -3128,6 +3330,13 @@ void Creature::ReleaseSpellFocus(Spell const* focusSpell, bool withDelay)
+@@ -3128,6 +3338,13 @@ void Creature::ReleaseSpellFocus(Spell const* focusSpell, bool withDelay)
          if (!HasUnitFlag2(UNIT_FLAG2_CANNOT_TURN))
              ReacquireSpellFocusTarget();
      }
@@ -96351,7 +96366,7 @@ index a0fa59a1a3..8b3ddced7f 100644
      else // don't allow re-target right away to prevent visual bugs
          _spellFocusInfo.Delay = withDelay ? 1000 : 1;
  
-@@ -3303,3 +3512,388 @@ void Creature::ExitVehicle(Position const* /*exitPosition*/)
+@@ -3303,3 +3520,388 @@ void Creature::ExitVehicle(Position const* /*exitPosition*/)
      if (isInVehicle && IsAlive())
          SetHomePosition(GetPosition());
  }
@@ -101540,7 +101555,7 @@ index 0423dc2eca..99a9aecdd4 100644
          // * use HandleGameObject(0, boolen, GO); in OnObjectCreate in instance scripts
          // * use HandleGameObject(GUID, boolen, nullptr); in any other script
 diff --git a/src/server/game/Maps/Map.cpp b/src/server/game/Maps/Map.cpp
-index 93837aa13d..eb97791189 100644
+index 5bacfd0d1d..679c4898be 100644
 --- a/src/server/game/Maps/Map.cpp
 +++ b/src/server/game/Maps/Map.cpp
 @@ -53,6 +53,11 @@
@@ -103346,7 +103361,7 @@ index 6af87e835d..e10baca113 100644
          // loading helpers
          void _InitializeExplicitTargetMask();
 diff --git a/src/server/game/Spells/SpellMgr.cpp b/src/server/game/Spells/SpellMgr.cpp
-index f60d19f1eb..8cd5909406 100644
+index 064ef6a3e8..84dba1ef83 100644
 --- a/src/server/game/Spells/SpellMgr.cpp
 +++ b/src/server/game/Spells/SpellMgr.cpp
 @@ -2946,6 +2946,18 @@ void SpellMgr::LoadSpellInfoCorrections()
@@ -103878,7 +103893,7 @@ index 37aaa997d6..50494f01bf 100644
          if (!caster)
              return false;
 diff --git a/src/server/scripts/Spells/spell_generic.cpp b/src/server/scripts/Spells/spell_generic.cpp
-index 5fd21f0501..beda5f7eda 100644
+index 2b2a1bbfa1..86390c1217 100644
 --- a/src/server/scripts/Spells/spell_generic.cpp
 +++ b/src/server/scripts/Spells/spell_generic.cpp
 @@ -248,6 +248,11 @@ class spell_gen_arena_drink : public AuraScript
@@ -103923,7 +103938,7 @@ index 5fd21f0501..beda5f7eda 100644
          // default case - not in arena
          if (!GetCaster()->ToPlayer()->InArena())
              regen->ChangeAmount(amount);
-@@ -3756,6 +3777,10 @@ class spell_gen_vehicle_scaling : public AuraScript
+@@ -3755,6 +3776,10 @@ class spell_gen_vehicle_scaling : public AuraScript
  
      bool Load() override
      {
@@ -103934,7 +103949,7 @@ index 5fd21f0501..beda5f7eda 100644
          return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
      }
  
-@@ -3778,7 +3803,19 @@ class spell_gen_vehicle_scaling : public AuraScript
+@@ -3777,7 +3802,19 @@ class spell_gen_vehicle_scaling : public AuraScript
                  break;
          }
  
